@@ -10,6 +10,7 @@ Feature: EFF Data - Get Blitz League API Automation
     * def signUpInfo = JSON.parse(rawSignUpInfo)
     * def existingAccessToken = karate.get('signUpInfo.accessToken', null)
     * def extremeBlitzLeagueId = karate.get('signUpInfo.extremeBlitzLeagueId', null)
+    * def initialBlitzMemberCount = karate.get('signUpInfo.initialBlitzMemberCount', null)
     * def buildLeagueData =
       """
       function(leagueId, existingAccessToken) {
@@ -91,7 +92,7 @@ Feature: EFF Data - Get Blitz League API Automation
       | existingPublicBlitzLeagueId  | Bearer invalidtoken123            | 401            | Invalid token   |
 
   @happy_path
-  Scenario Outline: GetBlitzLeague succeeds with valid league ID
+  Scenario Outline: GetBlitzLeague succeeds with valid league ID and verifies member count increment
     # PREREQUISITE CHECK: Ensure access token and league ID exist
     * if (existingAccessToken == null) karate.fail('No access token found in test data. Run login.feature first')
     * if (extremeBlitzLeagueId == null) karate.abort()
@@ -114,6 +115,17 @@ Feature: EFF Data - Get Blitz League API Automation
     * match league.League_Type == 'BLITZ'
     * match league.Game_Type == 'EXTREME'
     * match league.Public == true
+    
+    # Verify member count increased after user joined and created team
+    * def currentMemberCount = league.Members
+    * print 'Current Member Count:', currentMemberCount
+    
+    * if (initialBlitzMemberCount != null && currentMemberCount <= initialBlitzMemberCount) karate.fail('Member count should have increased after joining. Before=' + initialBlitzMemberCount + ', After=' + currentMemberCount)
+    
+    # Save current member count for leave verification
+    * def updatedInfo = signUpInfo
+    * updatedInfo.currentBlitzMemberCount = currentMemberCount
+    * karate.write(updatedInfo, 'target/info.txt')
 
     Examples:
       | leagueId                     | expectedStatus | 
