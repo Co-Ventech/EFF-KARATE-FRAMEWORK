@@ -43,7 +43,7 @@ Feature: Helper - Setup Default Timeframe to Preseason Week 1
     * match response.data.setTimeframe.current_timeframe.Season == <season>
     * match response.data.setTimeframe.current_timeframe.SeasonType == <seasonType>
     * match response.data.setTimeframe.current_timeframe.Week == <week>
-    * print '⏰ Default timeframe set: Season <season>, Preseason Week <week> (All league operations ALLOWED)'
+    * print 'Default timeframe set: Season <season>, Preseason Week <week> (All league operations ALLOWED)'
 
     Examples:
       | season | seasonType | week | expectedStatus | expectedMessage      |
